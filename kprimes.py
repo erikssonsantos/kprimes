@@ -13,17 +13,20 @@
 from typing import Union
 
 
-def kprimes(comeco_intervalo: int, fim_intervalo: int, previous: bool=False, next_prime: bool=False, retornar: int=0):
+def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool=False) -> object:
 
     primo: bool = True
 
     if comeco_intervalo <= 2:
         primos_no_intervalo: dict = {1: 2}
-        quant_primos = len(primos_no_intervalo)
+        yield 2
+        quant_primos = 1
         comeco_intervalo = 3
     else:
         primos_no_intervalo = {1: 2, 2: 3}
-        quant_primos = len(primos_no_intervalo)
+        yield 2
+        yield 3
+        quant_primos = 2
         for numero_analisado in range(5, comeco_intervalo + 1, 2):
             raiz_quadrada_numero_analisado = numero_analisado ** .5
             for candidato_a_divisor in primos_no_intervalo.values():
@@ -34,6 +37,7 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, previous: bool=False, nex
                     break
             if primo:
                 quant_primos += 1
+                yield numero_analisado
                 primos_no_intervalo[quant_primos] = numero_analisado
             primo = True
 
@@ -51,12 +55,11 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, previous: bool=False, nex
                 break
         if primo:
             quant_primos += 1
+            yield numero_analisado
             primos_no_intervalo[quant_primos] = numero_analisado
         primo = True
-
-    if previous:
-        return primos_no_intervalo[quant_primos - 1]
-
+    
+    
     if next_prime:
         numero_analisado = fim_intervalo
         if numero_analisado >= 2:
@@ -72,40 +75,26 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, previous: bool=False, nex
                 if primo:
                     quant_primos += 1
                     primos_no_intervalo[quant_primos] = numero_analisado
+                    yield numero_analisado
                     break
                 primo = True
-        return primos_no_intervalo[quant_primos]
-
-    if retornar == 0:
-        return primos_no_intervalo, quant_para_ignorar, quant_primos
-    elif retornar == 1:
-        return primos_no_intervalo
-    elif retornar == 3:
-        return quant_primos, quant_para_ignorar
 
 
-def isprime(numero: int) -> bool:
+def isprime(numero: int, /) -> bool:
 
     if not isinstance(numero, int):
         raise TypeError
     if numero < 2:
         return False
-
-    isprimo = None
-
-    primos_no_intervalo = kprimes(0, numero, retornar=1)
-
-    for v in primos_no_intervalo.values():
-        if numero == v:
-            isprimo = True
-            break
-        else:
-            isprimo = False
-
-    return isprimo
+    
+    for i in kprimes(0, numero):
+        if numero == i:
+            return True
+    
+    return False
 
 
-def keyprime(numero: int) -> Union[int, None]:
+def keyprime(numero: int, /) -> Union[int, None]:
 
     if not isinstance(numero, int):
         raise TypeError
@@ -114,20 +103,16 @@ def keyprime(numero: int) -> Union[int, None]:
 
     if not isprime(numero):
         return None
-
-    keyprimo = None
-
-    primos_no_intervalo = kprimes(0, numero, retornar=1)
-
-    for k, v in primos_no_intervalo.items():
-        if numero == v:
-            keyprimo = k
-            break
-
-    return keyprimo
+    
+    p = 0
+    
+    for i in kprimes(0, numero):
+        p += 1
+        if numero == i:
+            return p
 
 
-def quantprimes(comeco_intervalo: int, fim_intervalo: int) -> int:
+def quantprimes(comeco_intervalo: int, fim_intervalo: int, /) -> int:
 
     if not isinstance(comeco_intervalo, int) or not isinstance(fim_intervalo, int):
         raise TypeError
@@ -135,16 +120,17 @@ def quantprimes(comeco_intervalo: int, fim_intervalo: int) -> int:
         raise ValueError
     if fim_intervalo < 2:
         return 0
+        
+    q = 0
+    
+    for i in kprimes(comeco_intervalo, fim_intervalo):
+        if i >= comeco_intervalo:
+            q += 1
+    
+    return q
+    
 
-    quant_primos, quant_para_ignorar = kprimes(comeco_intervalo, fim_intervalo, retornar=3)
-
-    if comeco_intervalo <= 2:
-        return quant_primos
-    else:
-        return quant_primos - quant_para_ignorar
-
-
-def randprime(comeco_intervalo: int, fim_intervalo: int) -> Union[int, None]:
+def randprime(comeco_intervalo: int, fim_intervalo: int, /) -> Union[int, None]:
 
     if not isinstance(comeco_intervalo, int) or not isinstance(fim_intervalo, int):
         raise TypeError
@@ -152,35 +138,57 @@ def randprime(comeco_intervalo: int, fim_intervalo: int) -> Union[int, None]:
         raise ValueError
     if fim_intervalo < 2:
         return None
-
-    primos_no_intervalo, quant_para_ignorar, quant_primos = kprimes(comeco_intervalo, fim_intervalo)
-
-    if quant_primos - quant_para_ignorar == 0:
-        return None
-
-    list_keys: list = []
-
-    for k in primos_no_intervalo.keys():
-        list_keys.append(k)
+    
+    x = quantprimes(comeco_intervalo, fim_intervalo)
     from random import randint
-    prime_random: int = randint(list_keys[quant_para_ignorar], quant_primos)
+    y = randint(1, x)
+    del(x)
+    z = 0
+    for i in kprimes(comeco_intervalo, fim_intervalo):
+        if i >= comeco_intervalo:
+            z += 1
+            if z == y:
+                return i
 
-    return primos_no_intervalo[prime_random]
 
-
-def previousprime(numero: int) -> Union[int, None]:
+def previousprime(numero: int, /) -> Union[int, None]:
 
     if not isinstance(numero, int):
         raise TypeError
     if numero <= 2:
         return None
+    
+    x = 0
+    y = 0
+    z = 0
+    
+    a: int = quantprimes(2, numero)
+    b: bool = a % 2 == 0
+    del(a)
+    
+    for i in kprimes(2, numero):
+        x += 1
+        if x % 2 == 0:
+            y = i
+        else:
+            z = i
+    else:
+        if numero > i:
+            return i
+    
+    if b:
+        if y == 0:
+            return None
+        return z
+    return y
 
-    return kprimes(2, numero, previous=True)
 
-
-def nextprime(numero: int) -> int:
+def nextprime(numero: int, /) -> int:
 
     if not isinstance(numero, int):
         raise TypeError
-
-    return kprimes(2, numero, next_prime=True)
+    
+    for i in kprimes(2, numero, next_prime=True):
+        pass
+    else:
+        return i

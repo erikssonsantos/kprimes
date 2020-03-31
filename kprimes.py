@@ -13,7 +13,7 @@
 from typing import Union
 
 
-def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool=False) -> object:
+def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = False):
 
     primo: bool = True
 
@@ -41,8 +41,6 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool=Fa
                 primos_no_intervalo[quant_primos] = numero_analisado
             primo = True
 
-    quant_para_ignorar = len(primos_no_intervalo)
-
     if comeco_intervalo % 2 == 0:
         comeco_intervalo += 1
     for numero_analisado in range(comeco_intervalo, fim_intervalo + 1, 2):
@@ -58,7 +56,6 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool=Fa
             yield numero_analisado
             primos_no_intervalo[quant_primos] = numero_analisado
         primo = True
-    
     
     if next_prime:
         numero_analisado = fim_intervalo

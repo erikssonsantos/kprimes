@@ -4,7 +4,7 @@
 
 # print(isprime(1291)) # Verifica se um número é primo
 # print(quantprimes(-4, 100000)) # Retorna a quantidade de primos em um intervalo
-# print(keyprime(97)) # Retorna a posição de um número primo no conjunto dos naturais
+# print(keyprime(97)) # Retorna a posição de um número primo na sequência geral
 # print(randprime(0, 100)) # Retorna um número primo aleatório dentro de um intervalo
 # print(previousprime(100)) # Retorna o número primo anterior
 # print(nextprime(23)) # Retorna o próximo número primo

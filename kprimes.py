@@ -83,11 +83,11 @@ def isprime(numero: int, /) -> bool:
         raise TypeError
     if numero < 2:
         return False
-    
+
     for i in kprimes(0, numero):
         if numero == i:
             return True
-    
+
     return False
 
 
@@ -100,9 +100,9 @@ def keyprime(numero: int, /) -> Union[int, None]:
 
     if not isprime(numero):
         return None
-    
+
     p = 0
-    
+
     for i in kprimes(0, numero):
         p += 1
         if numero == i:
@@ -117,15 +117,15 @@ def quantprimes(comeco_intervalo: int, fim_intervalo: int, /) -> int:
         raise ValueError
     if fim_intervalo < 2:
         return 0
-        
+
     q = 0
-    
+
     for i in kprimes(comeco_intervalo, fim_intervalo):
         if i >= comeco_intervalo:
             q += 1
-    
+
     return q
-    
+
 
 def randprime(comeco_intervalo: int, fim_intervalo: int, /) -> Union[int, None]:
 

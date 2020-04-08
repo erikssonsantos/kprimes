@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# Funciona com python 3.8.0 ou versões superiores
 
 # print(isprime(1291)) # Verifica se um número é primo
 # print(quantprimes(-4, 100000)) # Retorna a quantidade de primos em um intervalo

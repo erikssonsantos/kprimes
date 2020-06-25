@@ -56,7 +56,7 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = 
             yield numero_analisado
             primos_no_intervalo[quant_primos] = numero_analisado
         primo = True
-    
+
     if next_prime:
         numero_analisado = fim_intervalo
         if numero_analisado >= 2:
@@ -135,7 +135,7 @@ def randprime(comeco_intervalo: int, fim_intervalo: int, /) -> Union[int, None]:
         raise ValueError
     if fim_intervalo < 2:
         return None
-    
+
     x = quantprimes(comeco_intervalo, fim_intervalo)
     from random import randint
     y = randint(1, x)
@@ -154,15 +154,15 @@ def previousprime(numero: int, /) -> Union[int, None]:
         raise TypeError
     if numero <= 2:
         return None
-    
+
     x = 0
     y = 0
     z = 0
-    
+
     a: int = quantprimes(2, numero)
     b: bool = a % 2 == 0
     del(a)
-    
+
     for i in kprimes(2, numero):
         x += 1
         if x % 2 == 0:
@@ -172,7 +172,7 @@ def previousprime(numero: int, /) -> Union[int, None]:
     else:
         if numero > i:
             return i
-    
+
     if b:
         if y == 0:
             return None
@@ -184,7 +184,7 @@ def nextprime(numero: int, /) -> int:
 
     if not isinstance(numero, int):
         raise TypeError
-    
+
     for i in kprimes(2, numero, next_prime=True):
         pass
     else:

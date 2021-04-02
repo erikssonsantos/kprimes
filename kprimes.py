@@ -16,34 +16,62 @@ from typing import Union
 def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = False):
 
     primo: bool = True
+    primos_no_intervalo: dict = {}
 
     if comeco_intervalo <= 2:
         primos_no_intervalo: dict = {1: 2}
         yield 2
         quant_primos = 1
         comeco_intervalo = 3
-    else:
-        primos_no_intervalo = {1: 2, 2: 3}
+        if fim_intervalo < comeco_intervalo:
+            fim_intervalo = comeco_intervalo
+    elif comeco_intervalo <= 5:
+        primos_no_intervalo: dict = {1: 2, 2: 3, 3: 5}
         yield 2
         yield 3
-        quant_primos = 2
-        for numero_analisado in range(5, comeco_intervalo + 1, 2):
-            raiz_quadrada_numero_analisado = numero_analisado ** .5
-            for candidato_a_divisor in primos_no_intervalo.values():
-                if candidato_a_divisor > raiz_quadrada_numero_analisado:
-                    break
-                if numero_analisado % candidato_a_divisor == 0:
-                    primo = False
-                    break
-            if primo:
+        yield 5
+        quant_primos = 3
+        comeco_intervalo = 7
+        if fim_intervalo < comeco_intervalo:
+            fim_intervalo = comeco_intervalo
+    else:
+        primos_no_intervalo = {1: 2, 2: 3, 3: 5, 4: 7}
+        yield 2
+        yield 3
+        yield 5
+        yield 7
+        quant_primos = 4
+        if fim_intervalo < comeco_intervalo:
+            fim_intervalo = comeco_intervalo
+        else:
+            for numero_analisado in range(9, comeco_intervalo + 1, 2):
+                if numero_analisado % 5 == 0:
+                    continue
+                raiz_quadrada_numero_analisado = numero_analisado ** .5
+                for candidato_a_divisor in primos_no_intervalo.values():
+                    if candidato_a_divisor > raiz_quadrada_numero_analisado:
+                        break
+                    if numero_analisado % candidato_a_divisor == 0:
+                        primo = False
+                        break
+                if primo:
+                    quant_primos += 1
+                    yield numero_analisado
+                    primos_no_intervalo[quant_primos] = numero_analisado
+                primo = True
+    
+    if comeco_intervalo % 2 == 0:
+        comeco_intervalo += 1
+    
+    for numero_analisado in range(comeco_intervalo, fim_intervalo + 1, 2):
+        if numero_analisado < 6:
+            if numero_analisado == 5:
                 quant_primos += 1
                 yield numero_analisado
                 primos_no_intervalo[quant_primos] = numero_analisado
-            primo = True
-
-    if comeco_intervalo % 2 == 0:
-        comeco_intervalo += 1
-    for numero_analisado in range(comeco_intervalo, fim_intervalo + 1, 2):
+                continue
+        if numero_analisado % 5 == 0:
+            continue
         raiz_quadrada_numero_analisado = numero_analisado ** .5
         for candidato_a_divisor in primos_no_intervalo.values():
             if candidato_a_divisor > raiz_quadrada_numero_analisado:
@@ -56,12 +84,14 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = 
             yield numero_analisado
             primos_no_intervalo[quant_primos] = numero_analisado
         primo = True
-
+    
     if next_prime:
         numero_analisado = fim_intervalo
         if numero_analisado >= 2:
             while True:
                 numero_analisado += 1
+                if numero_analisado % 5 == 0:
+                    continue
                 raiz_quadrada_numero_analisado = numero_analisado ** .5
                 for candidato_a_divisor in primos_no_intervalo.values():
                     if candidato_a_divisor > raiz_quadrada_numero_analisado:
@@ -77,36 +107,53 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = 
                 primo = True
 
 
-def isprime(numero: int, /) -> bool:
-
+def verificacao_preliminar(numero: int, /) ->bool:
     if not isinstance(numero, int):
         raise TypeError
     if numero < 2:
         return False
+    if numero % 2 == 0:
+        return False
+    if numero % 5 == 0 and numero > 5:
+        return False
+    
+    return True
 
+
+def isprime_core(numero: int, /) -> bool:
     for i in kprimes(0, numero):
         if numero == i:
             return True
 
+
+def isprime(numero: int, /, *, preliminar_foi_feita: bool = False) -> bool:
+    
+    if preliminar_foi_feita:
+        if isprime_core(numero):
+            return True
+    
+    if verificacao_preliminar(numero):
+        if isprime_core(numero):
+            return True
+    
     return False
 
 
 def keyprime(numero: int, /) -> Union[int, None]:
+    
+    if verificacao_preliminar(numero):
+        
+        if not isprime(numero, preliminar_foi_feita=True):
+            return None
 
-    if not isinstance(numero, int):
-        raise TypeError
-    if numero < 2:
-        return None
+        p = 0
 
-    if not isprime(numero):
-        return None
-
-    p = 0
-
-    for i in kprimes(0, numero):
-        p += 1
-        if numero == i:
-            return p
+        for i in kprimes(0, numero):
+            p += 1
+            if numero == i:
+                return p
+    
+    return None
 
 
 def quantprimes(comeco_intervalo: int, fim_intervalo: int, /) -> int:
@@ -117,6 +164,7 @@ def quantprimes(comeco_intervalo: int, fim_intervalo: int, /) -> int:
         raise ValueError
     if fim_intervalo < 2:
         return 0
+
 
     q = 0
 

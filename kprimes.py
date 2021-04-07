@@ -11,100 +11,181 @@
 
 
 from typing import Union
+from math import floor
 
 
 def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = False):
 
     primo: bool = True
     primos_no_intervalo: dict = {}
-
-    if comeco_intervalo <= 2:
-        primos_no_intervalo: dict = {1: 2}
+    viavel: bool = True
+    quant_primos: int = 0
+    comeco_intervalo_2: int = comeco_intervalo
+    
+    if fim_intervalo < comeco_intervalo:
+        viavel = False
+        
+    elif comeco_intervalo <= 2:
+        primos_no_intervalo = {1: 2}
         yield 2
         quant_primos = 1
-        comeco_intervalo = 3
-        if fim_intervalo < comeco_intervalo:
-            fim_intervalo = comeco_intervalo
-    elif comeco_intervalo <= 5:
-        primos_no_intervalo: dict = {1: 2, 2: 3, 3: 5}
+        comeco_intervalo_2 = 3
+        
+    elif comeco_intervalo == 3:
+        primos_no_intervalo = {1: 2, 2: 3}
+        yield 2
+        yield 3
+        quant_primos = 2
+        comeco_intervalo_2 = 5
+        
+    elif comeco_intervalo == 4:
+        primos_no_intervalo = {1: 2, 2: 3}
+        yield 2
+        yield 3
+        quant_primos = 2
+        comeco_intervalo_2 = 5
+    
+    elif comeco_intervalo == 5:
+        primos_no_intervalo = {1: 2, 2: 3, 3: 5}
         yield 2
         yield 3
         yield 5
         quant_primos = 3
-        comeco_intervalo = 7
-        if fim_intervalo < comeco_intervalo:
-            fim_intervalo = comeco_intervalo
-    else:
-        primos_no_intervalo = {1: 2, 2: 3, 3: 5, 4: 7}
+        comeco_intervalo_2 = 7
+    
+    elif comeco_intervalo == 6:
+        primos_no_intervalo = {1: 2, 2: 3, 3: 5}
         yield 2
         yield 3
         yield 5
-        yield 7
-        quant_primos = 4
-        if fim_intervalo < comeco_intervalo:
-            fim_intervalo = comeco_intervalo
-        else:
-            for numero_analisado in range(9, comeco_intervalo + 1, 2):
-                if numero_analisado % 5 == 0:
-                    continue
-                raiz_quadrada_numero_analisado = numero_analisado ** .5
-                for candidato_a_divisor in primos_no_intervalo.values():
-                    if candidato_a_divisor > raiz_quadrada_numero_analisado:
-                        break
-                    if numero_analisado % candidato_a_divisor == 0:
-                        primo = False
-                        break
-                if primo:
-                    quant_primos += 1
-                    yield numero_analisado
-                    primos_no_intervalo[quant_primos] = numero_analisado
-                primo = True
+        quant_primos = 3
+        comeco_intervalo_2 = 7
     
-    if comeco_intervalo % 2 == 0:
-        comeco_intervalo += 1
-    
-    for numero_analisado in range(comeco_intervalo, fim_intervalo + 1, 2):
-        if numero_analisado < 6:
-            if numero_analisado == 5:
+    else:
+        primos_no_intervalo = {1: 2, 2: 3, 3: 5}
+        yield 2
+        yield 3
+        yield 5
+        quant_primos = 3
+        
+        pulo = 0
+        
+        limite_de_teste = floor(comeco_intervalo_2 ** .5)
+        testadores = list(primos_no_intervalo.values())[:limite_de_teste]
+        len_testadores = len(testadores)
+        for numero_analisado in range(7, comeco_intervalo + 1, 2):
+            pulo += 1
+            if pulo == 5:
+                pulo = 0
+                continue
+            limite_de_teste = floor(numero_analisado ** .5)
+            for candidato_a_divisor in testadores:
+                if candidato_a_divisor > limite_de_teste:
+                    break
+                if numero_analisado % candidato_a_divisor == 0:
+                    primo = False
+                    break
+            if primo:
                 quant_primos += 1
                 yield numero_analisado
                 primos_no_intervalo[quant_primos] = numero_analisado
-                continue
-        if numero_analisado % 5 == 0:
-            continue
-        raiz_quadrada_numero_analisado = numero_analisado ** .5
-        for candidato_a_divisor in primos_no_intervalo.values():
-            if candidato_a_divisor > raiz_quadrada_numero_analisado:
-                break
-            if numero_analisado % candidato_a_divisor == 0:
-                primo = False
-                break
-        if primo:
-            quant_primos += 1
-            yield numero_analisado
-            primos_no_intervalo[quant_primos] = numero_analisado
-        primo = True
+            primo = True
+            if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
+                testadores.append(primos_no_intervalo[len_testadores + 1])
+                len_testadores += 1
+        
+        if comeco_intervalo % 2 == 0:
+            comeco_intervalo_2 = comeco_intervalo + 1
     
-    if next_prime:
-        numero_analisado = fim_intervalo
-        if numero_analisado >= 2:
-            while True:
-                numero_analisado += 1
-                if numero_analisado % 5 == 0:
+    
+    if viavel:
+        
+        pulo = None
+        
+        ultimo_digito = int(str(comeco_intervalo_2)[-1])
+        
+        if ultimo_digito == 7:
+            pulo = 0
+        elif ultimo_digito == 9:
+            pulo = 1
+        elif ultimo_digito == 1:
+            pulo = 2
+        elif ultimo_digito == 3:
+            pulo = 3
+        elif ultimo_digito == 5:
+            pulo = 4
+        
+        limite_de_teste = floor(comeco_intervalo_2 ** .5)
+        testadores = list(primos_no_intervalo.values())[:limite_de_teste]
+        len_testadores = len(testadores)
+        for numero_analisado in range(comeco_intervalo_2, fim_intervalo + 1, 2):
+            pulo += 1
+            if pulo == 5:
+                pulo = 0
+                if numero_analisado != 5:
                     continue
-                raiz_quadrada_numero_analisado = numero_analisado ** .5
-                for candidato_a_divisor in primos_no_intervalo.values():
-                    if candidato_a_divisor > raiz_quadrada_numero_analisado:
-                        break
-                    if numero_analisado % candidato_a_divisor == 0:
-                        primo = False
-                        break
-                if primo:
-                    quant_primos += 1
-                    primos_no_intervalo[quant_primos] = numero_analisado
-                    yield numero_analisado
+            limite_de_teste = floor(numero_analisado ** .5)
+            for candidato_a_divisor in testadores:
+                if candidato_a_divisor > limite_de_teste:
                     break
-                primo = True
+                if numero_analisado % candidato_a_divisor == 0:
+                    primo = False
+                    break
+            if primo:
+                quant_primos += 1
+                yield numero_analisado
+                primos_no_intervalo[quant_primos] = numero_analisado
+            primo = True
+            if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
+                testadores.append(primos_no_intervalo[len_testadores + 1])
+                len_testadores += 1
+        
+        
+        if next_prime:
+            numero_analisado = fim_intervalo
+            if numero_analisado % 2 == 0:
+                numero_analisado += 1
+            if numero_analisado >= 2:
+                
+                ultimo_digito = int(str(numero_analisado)[-1])
+        
+                if ultimo_digito == 7:
+                    pulo = 0
+                elif ultimo_digito == 9:
+                    pulo = 1
+                elif ultimo_digito == 1:
+                    pulo = 2
+                elif ultimo_digito == 3:
+                    pulo = 3
+                elif ultimo_digito == 5:
+                    pulo = 4
+                
+                limite_de_teste = floor(numero_analisado ** .5)
+                testadores = list(primos_no_intervalo.values())[:limite_de_teste]
+                len_testadores = len(testadores)
+                while True:
+                    pulo += 1
+                    if pulo == 5:
+                        pulo = 0
+                        if numero_analisado != 5:
+                            continue
+                    limite_de_teste = floor(numero_analisado ** .5)
+                    for candidato_a_divisor in testadores:
+                        if candidato_a_divisor > limite_de_teste:
+                            break
+                        if numero_analisado % candidato_a_divisor == 0:
+                            primo = False
+                            break
+                    if primo:
+                        quant_primos += 1
+                        primos_no_intervalo[quant_primos] = numero_analisado
+                        yield numero_analisado
+                        break
+                    primo = True
+                    if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
+                        testadores.append(primos_no_intervalo[len_testadores + 1])
+                        len_testadores += 1
+                    numero_analisado += 2
 
 
 def verificacao_preliminar(numero: int, /) ->bool:
@@ -160,7 +241,7 @@ def quantprimes(comeco_intervalo: int, fim_intervalo: int, /) -> int:
 
     if not isinstance(comeco_intervalo, int) or not isinstance(fim_intervalo, int):
         raise TypeError
-    if comeco_intervalo >= fim_intervalo:
+    if comeco_intervalo > fim_intervalo:
         raise ValueError
     if fim_intervalo < 2:
         return 0
@@ -179,7 +260,7 @@ def randprime(comeco_intervalo: int, fim_intervalo: int, /) -> Union[int, None]:
 
     if not isinstance(comeco_intervalo, int) or not isinstance(fim_intervalo, int):
         raise TypeError
-    if comeco_intervalo >= fim_intervalo:
+    if comeco_intervalo > fim_intervalo:
         raise ValueError
     if fim_intervalo < 2:
         return None

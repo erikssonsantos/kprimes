@@ -125,3 +125,11 @@ dmypy.json
 .pyre/
 .idea/
 .gitignore
+
+
+
+
+# Custom ignore
+
+kprimes2.py
+

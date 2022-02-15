@@ -89,10 +89,11 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = 
                 quant_primos += 1
                 yield numero_analisado
                 primos_no_intervalo[quant_primos] = numero_analisado
+                if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
+                    testadores.append(primos_no_intervalo[len_testadores + 1])
+                    len_testadores += 1
             primo = True
-            if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
-                testadores.append(primos_no_intervalo[len_testadores + 1])
-                len_testadores += 1
+            
         
         if comeco_intervalo % 2 == 0:
             comeco_intervalo_2 = comeco_intervalo + 1
@@ -135,57 +136,71 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = 
                 quant_primos += 1
                 yield numero_analisado
                 primos_no_intervalo[quant_primos] = numero_analisado
+                if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
+                    testadores.append(primos_no_intervalo[len_testadores + 1])
+                    len_testadores += 1
             primo = True
-            if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
-                testadores.append(primos_no_intervalo[len_testadores + 1])
-                len_testadores += 1
-        
+            
         
         if next_prime:
             numero_analisado = fim_intervalo
-            if numero_analisado % 2 == 0:
-                numero_analisado += 1
+            
             if numero_analisado >= 2:
-                
-                ultimo_digito = int(str(numero_analisado)[-1])
-        
-                if ultimo_digito == 7:
-                    pulo = 0
-                elif ultimo_digito == 9:
-                    pulo = 1
-                elif ultimo_digito == 1:
-                    pulo = 2
-                elif ultimo_digito == 3:
-                    pulo = 3
-                elif ultimo_digito == 5:
-                    pulo = 4
-                
-                limite_de_teste = floor(numero_analisado ** .5)
-                testadores = list(primos_no_intervalo.values())[:limite_de_teste]
-                len_testadores = len(testadores)
-                while True:
-                    pulo += 1
-                    if pulo == 5:
+
+                if numero_analisado == 2:
+                    quant_primos += 1
+                    primos_no_intervalo[quant_primos] = 3
+                    yield 3
+                elif numero_analisado in (3, 4):
+                    quant_primos += 1
+                    primos_no_intervalo[quant_primos] = 5
+                    yield 5
+                elif numero_analisado in (5, 6):
+                    quant_primos += 1
+                    primos_no_intervalo[quant_primos] = 7
+                    yield 7
+                else:
+                    
+                    if numero_analisado % 2 == 0:
+                        numero_analisado += 1
+                    if numero_analisado in primos_no_intervalo.values():
+                        numero_analisado += 2
+                    
+                    ultimo_digito = int(str(numero_analisado)[-1])
+            
+                    if ultimo_digito == 7:
                         pulo = 0
-                        if numero_analisado != 5:
-                            continue
+                    elif ultimo_digito == 9:
+                        pulo = 1
+                    elif ultimo_digito == 1:
+                        pulo = 2
+                    elif ultimo_digito == 3:
+                        pulo = 3
+                    elif ultimo_digito == 5:
+                        pulo = 4
+                    
                     limite_de_teste = floor(numero_analisado ** .5)
-                    for candidato_a_divisor in testadores:
-                        if candidato_a_divisor > limite_de_teste:
+                    testadores = list(primos_no_intervalo.values())[:limite_de_teste]
+                    len_testadores = len(testadores)
+                    while True:
+                        pulo += 1
+                        if pulo == 5:
+                            pulo = 0
+                            continue
+                        limite_de_teste = floor(numero_analisado ** .5)
+                        for candidato_a_divisor in testadores:
+                            if candidato_a_divisor > limite_de_teste:
+                                break
+                            if numero_analisado % candidato_a_divisor == 0:
+                                primo = False
+                                break
+                        if primo:
+                            quant_primos += 1
+                            primos_no_intervalo[quant_primos] = numero_analisado
+                            yield numero_analisado
                             break
-                        if numero_analisado % candidato_a_divisor == 0:
-                            primo = False
-                            break
-                    if primo:
-                        quant_primos += 1
-                        primos_no_intervalo[quant_primos] = numero_analisado
-                        yield numero_analisado
-                        break
-                    primo = True
-                    if limite_de_teste > primos_no_intervalo[len_testadores + 1] or len_testadores < limite_de_teste:
-                        testadores.append(primos_no_intervalo[len_testadores + 1])
-                        len_testadores += 1
-                    numero_analisado += 2
+                        primo = True
+                        numero_analisado += 2
 
 
 def verificacao_preliminar(numero: int, /) ->bool:
@@ -202,9 +217,9 @@ def verificacao_preliminar(numero: int, /) ->bool:
 
 
 def isprime_core(numero: int, /) -> bool:
-    for i in kprimes(0, numero):
-        if numero == i:
-            return True
+    
+    if numero in kprimes(0, numero):
+        return True
 
 
 def isprime(numero: int, /, *, preliminar_foi_feita: bool = False) -> bool:
@@ -229,11 +244,8 @@ def keyprime(numero: int, /) -> Union[int, None]:
 
         p = 0
 
-        for i in kprimes(0, numero):
-            p += 1
-            if numero == i:
-                return p
-    
+        return tuple(kprimes(0, numero)).index(numero) + 1
+        
     return None
 
 
@@ -246,12 +258,15 @@ def quantprimes(comeco_intervalo: int, fim_intervalo: int, /) -> int:
     if fim_intervalo < 2:
         return 0
 
-
     q = 0
 
-    for i in kprimes(comeco_intervalo, fim_intervalo):
-        if i >= comeco_intervalo:
-            q += 1
+    if comeco_intervalo <= 2:
+        for i in kprimes(comeco_intervalo, fim_intervalo):
+                q += 1
+    else:
+        for i in kprimes(comeco_intervalo, fim_intervalo):
+            if i >= comeco_intervalo:
+                q += 1
 
     return q
 
@@ -284,9 +299,9 @@ def previousprime(numero: int, /) -> Union[int, None]:
     if numero <= 2:
         return None
 
-    x = 0
-    y = 0
-    z = 0
+    x: int = 0
+    y: int = 0
+    z: int = 0
 
     a: int = quantprimes(2, numero)
     b: bool = a % 2 == 0
@@ -313,8 +328,5 @@ def nextprime(numero: int, /) -> int:
 
     if not isinstance(numero, int):
         raise TypeError
-
-    for i in kprimes(2, numero, next_prime=True):
-        pass
-    else:
-        return i
+    
+    return tuple(kprimes(2, numero, next_prime=True))[-1]

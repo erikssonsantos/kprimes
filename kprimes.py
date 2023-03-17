@@ -242,8 +242,6 @@ def keyprime(numero: int, /) -> Union[int, None]:
         if not isprime(numero, preliminar_foi_feita=True):
             return None
 
-        p = 0
-
         return tuple(kprimes(0, numero)).index(numero) + 1
         
     return None
@@ -258,17 +256,7 @@ def quantprimes(comeco_intervalo: int, fim_intervalo: int, /) -> int:
     if fim_intervalo < 2:
         return 0
 
-    q = 0
-
-    if comeco_intervalo <= 2:
-        for i in kprimes(comeco_intervalo, fim_intervalo):
-                q += 1
-    else:
-        for i in kprimes(comeco_intervalo, fim_intervalo):
-            if i >= comeco_intervalo:
-                q += 1
-
-    return q
+    return len(tuple(kprimes(comeco_intervalo, fim_intervalo)))
 
 
 def randprime(comeco_intervalo: int, fim_intervalo: int, /) -> Union[int, None]:
@@ -330,3 +318,12 @@ def nextprime(numero: int, /) -> int:
         raise TypeError
     
     return tuple(kprimes(2, numero, next_prime=True))[-1]
+
+
+# tests
+import time
+
+inicio = time.time()
+print(quantprimes(-4, 1000000))
+fim = time.time()
+print(fim - inicio)

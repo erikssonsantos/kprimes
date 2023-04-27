@@ -95,7 +95,7 @@ def kprimes(comeco_intervalo: int, fim_intervalo: int, /, *, next_prime: bool = 
             primo = True
             
         
-        if comeco_intervalo % 2 == 0:
+        if comeco_intervalo & 1 == 0:
             comeco_intervalo_2 = comeco_intervalo + 1
     
     

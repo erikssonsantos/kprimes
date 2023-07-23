@@ -319,11 +319,3 @@ def nextprime(numero: int, /) -> int:
     
     return tuple(kprimes(2, numero, next_prime=True))[-1]
 
-
-# tests
-import time
-
-inicio = time.time()
-print(quantprimes(-4, 1000000))
-fim = time.time()
-print(fim - inicio)
